@@ -20,6 +20,8 @@ $(document).ready(function(){
 
 function deal(){
 	$(".card").addClass("empty").html("");
+	$("div[id^='dealer-card-']").css('background-position', "0px -482px");
+	$("div[id^='player-card-']").css('background-position', "0px -482px");
 	$("#message").html("");
 	playerTotalCards = 2;
 	dealerTotalCards = 2;
@@ -38,16 +40,20 @@ function deal(){
 }
 
 function placeCard(card, who, slot){
+	var position = (card[1] + "px ") + card[2];
 	var currID = "#" + who + "-card-" + slot;
 	$(currID).removeClass("empty");
-	$(currID).html(card);
+	$(currID).css('background-position', position);
+	$(currID).attr("value", card[0]);
 }
 function calculateTotal(hand, who){
 	var total = 0;
-	for(var i = 0; i<hand.length; i++){
-		var cardValue = Number(hand[i].slice(0,-1));
+	for(var i = 0; i < hand.length; i++){
+		var cardValue = Number(hand[i][0].slice(0,-1));
 		if(cardValue === 11 || cardValue === 12 || cardValue ===13){
 			cardValue = 10;
+		}else if(cardValue === 14){
+			cardValue = 11;
 		}
 		total += cardValue
 	}
@@ -64,19 +70,34 @@ function calculateTotal(hand, who){
 
 // s1 = hearts, s2=spades, s3=diamonds, s4=clubs
 function shuffleDeck(){
+	var x = 0;
+	var y = 0;
 	for(var s = 1; s <= 4; s++)	{
 		var suit = "";
 		if(s === 1){
 			suit = "h";
+			y = "0px";
+			x = 0;
 		}else if(s===2){
-			suit = "s";
-		}else if(s===3){
 			suit = "d";
-		}else if(s===4){
+			y = "-120px";
+			x = 0;
+		}else if(s===3){
 			suit = "c";
+			y = "-240.5px";
+			x = 0;
+		}else if(s===4){
+			suit = "s";
+			y = "-361px";
+			x = 0;
 		}
-		for(var i = 1; i <= 13; i++){
-			theDeck.push(i+suit);
+		for(var i = 2; i <= 14; i++){
+			var valueToPush = [];
+			valueToPush[0] = (i+suit);
+			valueToPush[1] = x;
+			valueToPush[2] = y;
+			theDeck.push(valueToPush);
+			x = (x - 86.2);
 		}
 	}
 	var numberOFTimesToShuffle = 500;
@@ -92,7 +113,7 @@ function shuffleDeck(){
 }
 
 function hit(){
-	var slot = "";
+	var slot = "two";
 	if(playerTotalCards === 2){
 		slot = "three";
 	}else if(playerTotalCards === 3){
@@ -100,7 +121,7 @@ function hit(){
 	}else if(playerTotalCards === 4){
 		slot = "five";
 	}else if(playerTotalCards === 5){
-		slot = "five";
+		slot = "six";
 	}
 
 	placeCard(theDeck[placeInDeck], "player", slot);
@@ -112,26 +133,28 @@ function hit(){
 
 function stand(){
 	var dealerTotal = $(".dealer-total").html();
-	setTimeout(function(){
-		while(dealerTotal < 17){
-				if(dealerTotalCards == 2){
-					slot = "three";
-				}else if(dealerTotalCards === 3){
-					slot = "four";
-				}else if(dealerTotalCards === 4){
-					slot = "five";
-				}else if(dealerTotalCards === 5){
-					slot = "five";
-				}				
-				placeCard(theDeck[placeInDeck], "dealer", slot);				
-				dealerHand.push(theDeck[placeInDeck]);
-				placeInDeck++;
-				dealerTotalCards++;
-				calculateTotal(dealerHand, "dealer");
-				dealerTotal = $(".dealer-total").html();	
+		if(dealerTotal < 17){
+			if(dealerTotalCards == 2){
+				slot = "three";
+			}else if(dealerTotalCards === 3){
+				slot = "four";
+			}else if(dealerTotalCards === 4){
+				slot = "five";
+			}else if(dealerTotalCards === 5){
+				slot = "six";
+			}
+			setTimeout(function(){			
+			placeCard(theDeck[placeInDeck], "dealer", slot);
+			dealerHand.push(theDeck[placeInDeck]);
+			placeInDeck++;
+			dealerTotalCards++;
+			calculateTotal(dealerHand, "dealer");
+			dealerTotal = $(".dealer-total").html();
+			stand();
+			}, 1000);
+		}else	{	
+			checkWin(); 
 		}
-	}, 1000);		
-	checkWin(); 
 }	
 
 function checkWin(){
