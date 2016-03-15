@@ -3,41 +3,50 @@ body{
 }
 
 .the-table{
-	background-color: #006600;
-	border: 50px solid #663300;
+	background: url("../img/redbackground.jpg");
+	border: 50px solid #000;
 	border-bottom-right-radius: 50%;
 	border-bottom-left-radius: 50%;
 	margin-top: -45px;
 	height: 700px;
 }
-
 .card{
 	color: black;
-	background-color: white;
 	width: 87px;
 	height: 122px;
 	padding: 10px;
 	background: url("../img/cards.gif");
 	background-size: 1122px 604px;
-
-	font-size: 40px;
+	position: relative;
 }
 .col-sm-2.card{
 	margin: 10px;
 }
-
+.cover{
+	background: url("../img/cards.gif");
+	background-size: 1122px 604px;
+	background-position: 0px -482px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 87px;
+	height: 122px;
+	visibility: hidden;
+}
 .card.empty{
-	border: dashed 1px black;
 	background-position: 0px -482px;
 	visibility: hidden;
 }
 .dealer-total-wrapper, .player-total-wrapper{
 	color: white;
-	font-size: 17px;
+	font-size: 20px;
 }
 .dealer-total-wrapper span, .player-total-wrapper span{
 	display: block;
 	text-align: center;
+}
+.dealer-total, .player-total{
+	visibility: hidden;
 }
 .action-buttons button{
 	width: 100%;
@@ -46,13 +55,19 @@ body{
 }
 #message{
 	color: white;
+	font-size: 30px;
+	height: 42px;
+}
+#betting-area{
+	margin-top: 30px;
+	height: 200px;
+	color: white;
 	font-size: 30px
 }
-
-
-
-
-
+img{
+	width: 100%;
+	max-width: 90px;
+}
 
 
 

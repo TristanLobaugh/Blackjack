@@ -3,6 +3,8 @@ var placeInDeck = 0;
 var playerTotalCards = 2;
 var dealerTotalCards = 2;
 var timer;
+var bank = 500;
+var bet = 0;
 
 $(document).ready(function(){
 
@@ -16,27 +18,45 @@ $(document).ready(function(){
 			stand();
 		}
 	});
+	$(".chips").click(function(){
+		thisBet = Number($(this).attr("value"));
+		if(thisBet > bank){
+			$("#message").html("Not Enough Funds!");
+		}else{
+			bet = bet + thisBet;
+			bank = bank - thisBet;
+			$(".bets").html(bet);
+			$(".bank").html(bank);
+		}
+	});
 });
 
 function deal(){
-	$(".card").addClass("empty").html("");
-	$("div[id^='dealer-card-']").css('background-position', "0px -482px");
-	$("div[id^='player-card-']").css('background-position', "0px -482px");
-	$("#message").html("");
-	playerTotalCards = 2;
-	dealerTotalCards = 2;
-	shuffleDeck();
-	playerHand = [theDeck[0], theDeck[2]];
-	dealerHand = [theDeck[1], theDeck[3]];
-	placeInDeck = 4;
-	placeCard(playerHand[0], "player", "one");
-	placeCard(dealerHand[0], "dealer", "one");
-	placeCard(playerHand[1], "player", "two");
-	placeCard(dealerHand[1], "dealer", "two");
-	calculateTotal(playerHand, "player");
-	calculateTotal(dealerHand, "dealer");
-	$("button").removeAttr("disabled");
-	$("#deal-button").attr("disabled", "disabled");
+	if(($(".bets").html()) < 1){
+		$("#message").html("Nothing bet!");
+	}else{
+		$(".card").addClass("empty");
+		$("div[id^='dealer-card-']").css('background-position', "0px -482px");
+		$("div[id^='player-card-']").css('background-position', "0px -482px");
+		$("#message").html("");
+		$(".cover, .player-total").css("visibility", "visible");
+		$(".dealer-total").css("visibility", "hidden");
+		playerTotalCards = 2;
+		dealerTotalCards = 2;
+		shuffleDeck();
+		playerHand = [theDeck[0], theDeck[2]];
+		dealerHand = [theDeck[1], theDeck[3]];
+		placeInDeck = 4;
+		placeCard(playerHand[0], "player", "one");
+		placeCard(dealerHand[0], "dealer", "one");
+		placeCard(playerHand[1], "player", "two");
+		placeCard(dealerHand[1], "dealer", "two");
+		calculateTotal(playerHand, "player");
+		calculateTotal(dealerHand, "dealer");
+		$("button").removeAttr("disabled");
+		$("#deal-button").attr("disabled", "disabled");
+		$(".chips").css("pointerEvents", "none");
+	}
 }
 
 function placeCard(card, who, slot){
@@ -70,6 +90,7 @@ function calculateTotal(hand, who){
 
 // s1 = hearts, s2=spades, s3=diamonds, s4=clubs
 function shuffleDeck(){
+	theDeck = [];
 	var x = 0;
 	var y = 0;
 	for(var s = 1; s <= 4; s++)	{
@@ -99,6 +120,7 @@ function shuffleDeck(){
 			theDeck.push(valueToPush);
 			x = (x - 86.2);
 		}
+		console.log(theDeck.length);
 	}
 	var numberOFTimesToShuffle = 500;
 	for(var i = 1; i < numberOFTimesToShuffle; i++){
@@ -132,6 +154,8 @@ function hit(){
 }
 
 function stand(){
+	$(".cover").css("visibility", "hidden");
+	$(".dealer-total").css("visibility", "visible");
 	var dealerTotal = $(".dealer-total").html();
 		if(dealerTotal < 17){
 			if(dealerTotalCards == 2){
@@ -161,19 +185,27 @@ function checkWin(){
 	var playerHas = Number($(".player-total").html());
 	var dealerHas = Number($(".dealer-total").html());
 	if(dealerHas>21){
-		//dealer bust
 		bust("dealer");
 	}else{
-		//neither player has busted and the dealer has at least 17
-		if(playerHas>dealerHas){
-			//player wins
+		if(playerHas > dealerHas){
 			$("#message").html("You have won!");
-		}else if(dealerHas>playerHas){
-			//dealer wins
+			bank = bank + (bet * 2);
+			$(".bank").html(bank);
+			bet = 0;
+			$(".bets").html(bet);
+			$(".chips").css("pointerEvents", "auto");
+		}else if(dealerHas > playerHas){
 			$("#message").html("Dealer has won!");
+			bet = 0;
+			$(".bets").html(bet);
+			$(".chips").css("pointerEvents", "auto");
 		}else{
-			//draw
 			$("#message").html("It\'s a push!");
+			bank = bank + bet;
+			$(".bank").html(bank);
+			bet = 0;
+			$(".bets").html(bet);
+			$(".chips").css("pointerEvents", "auto");
 		}	
 	}
 	$("button").attr("disabled", "disabled");
@@ -183,12 +215,23 @@ function checkWin(){
 function bust(who){
 	if(who === "player"){
 		$("#message").html("You have busted!");
+		bet = 0;
+		$(".bets").html(bet);
+		$(".chips").css("pointerEvents", "auto");
+		$(".cover").css("visibility", "hidden");
+		$(".dealer-total").css("visibility", "visible");
 	}else{
 		$("#message").html("The dealer has busted!");
+		bank = bank + (bet * 2);
+		$(".bank").html(bank);
+		bet = 0;
+		$(".bets").html(bet);
+		$(".chips").css("pointerEvents", "auto");
 	}
 	$("button").attr("disabled", "disabled");
 	$("#deal-button").removeAttr("disabled");
 }
+
 
 
 
